@@ -93,25 +93,45 @@ async function startApp() {
 
 			const avatarUrl = await getAvatarUrl(userId);
 
+			const moderatorRobloxId = await noblox.getIdFromUsername(moderator);
+			const moderatorThumbnails = await noblox.getThumbnails([
+				{
+					targetId: Number(moderatorRobloxId),
+					type: 'AvatarHeadShot',
+					size: '150x150',
+					isCircular: true,
+				},
+			]);
+			const moderatorAvatarUrl = moderatorThumbnails[0]?.imageUrl;
+
 			const embedData = {
-				title: 'Rank Change',
 				color: 0x27f561,
+				author: {
+					name: `Rank Change Executed by ${moderator}`,
+					icon_url:
+						moderatorAvatarUrl || 'https://cdn1.novaverse.cc/placeholder.png',
+					url: `https://www.roblox.com/users/${moderatorRobloxId}/profile`,
+				},
+				title: `${info.username} (${userId})`,
+				url: `https://www.roblox.com/users/${userId}/profile`,
+				thumbnail: avatarUrl
+					? { url: avatarUrl }
+					: 'https://cdn1.novaverse.cc/placeholder.png',
 				fields: [
-					{ name: 'User ID', value: userId.toString(), inline: true },
-					{ name: 'Username', value: info.username, inline: true },
 					{ name: 'Old Rank', value: oldRankName ?? 'Unknown', inline: true },
 					{ name: 'New Rank', value: info.rankName, inline: true },
-					{ name: 'Reason', value: `\`\`\`${reason}\`\`\`` },
+					{
+						name: 'Reason',
+						value: reason ? `\`\`\`${reason}\`\`\`` : 'No reason provided',
+					},
 				],
+				footer: {
+					text: `Rank change executed at`,
+				},
 				timestamp: new Date().toISOString(),
-				// Only add thumbnail property if avatarUrl is not null
-				...(avatarUrl && { thumbnail: { url: avatarUrl } }),
 			};
 
-			await sendWebhookLog(
-				`Rank change executed by **${moderator}**`,
-				embedData
-			);
+			await sendWebhookLog(``, embedData);
 
 			res.json({ success: true, newRole, oldRankName, info });
 		} catch (err) {
