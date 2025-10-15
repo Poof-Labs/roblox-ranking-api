@@ -1,8 +1,6 @@
 import express = require('express');
 import dotenv = require('dotenv');
 import noblox = require('noblox.js');
-import getPlayerThumbnail = require('noblox.js');
-import getAvatar = require('noblox.js');
 const { getUserGroupInfo } = require('./utils/roblox');
 const { checkApiKey } = require('./utils/middleware');
 const { sendWebhookLog } = require('./utils/webhookLog');
